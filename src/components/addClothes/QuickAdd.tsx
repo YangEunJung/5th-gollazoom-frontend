@@ -4,7 +4,6 @@ import {
     SEASON_OPTIONS, 
     CATEGORY_OPTIONS, 
     SUB_CATEGORY_OPTIONS, 
-    type Option 
 } from '../../data/constants';
 import { useNavigate } from "react-router-dom";
 import { addCloth, type QuickClothRequest } from '../../api/closet';

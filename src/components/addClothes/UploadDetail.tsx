@@ -4,7 +4,6 @@ import {
   COLOR_OPTIONS, 
   SEASON_OPTIONS, 
   CATEGORY_OPTIONS, 
-  type Option 
 } from '../../data/constants';
 import { addCloth } from '../../api/closet';
 

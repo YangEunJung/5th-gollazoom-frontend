@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { CATEGORY_OPTIONS, SEASON_OPTIONS, type Option } from '../../data/constants';
 import { deleteCloth, updateCloth, type UpdateClothRequest } from '../../api/closet';
 import ClothItem from '../../components/common/ClothItem';
