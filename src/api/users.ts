@@ -42,7 +42,7 @@ export const getUserInfo = async () => {
 }
 
 export const setWorkTime = async (worktime: string) => {
-    const response = await api.post('/users/time', { worktime });
+    const response = await api.post('/users/worktime', { worktime });
     return response.data;
 }
 
@@ -61,7 +61,7 @@ export const changeNickname = async (nickname: string) => {
 };
 
 export const changeWorktime = async (worktime: string) => {
-    const response = await api.patch('/users/time', { worktime });
+    const response = await api.patch('/users/worktime', { worktime });
     return response.data;
 }
 

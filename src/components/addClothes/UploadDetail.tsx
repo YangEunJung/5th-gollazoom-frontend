@@ -47,35 +47,45 @@ const UploadDetail = () => {
     );
   };
 
-  const handleSubmit = async () => {
+const handleSubmit = async () => {
+    // 0. 필수 항목 검사
     if (!imageFile || !category || selectedSeasons.length === 0 || selectedColors.length === 0) {
       alert("이미지와 필수 항목을 모두 선택해주세요.");
       return;
     }
 
     const formData = new FormData();
-    if (imageFile) formData.append('image', imageFile);
-    formData.append('category', category);
-    formData.append('season', selectedSeasons.join(','));
-    formData.append('color', selectedColors.join(','));
-    formData.append('isRaining', String(isRaining));
-    formData.append('memo', memo);
+    
+    // 1. 이미지 파일 담기 (백엔드의 @RequestPart("image")와 연결)
+    formData.append('image', imageFile); 
 
-    // 사진 등록일 때는 이 값들을 비워서
-    formData.append('imageUrl', "FILE_UPLOAD"); // ""이 아니면 파일 업로드로 인식할 것임
-    formData.append('subCategory', ""); 
-    formData.append('colorCode', "");
+    // 2. 나머지 텍스트 데이터를 하나의 JSON 객체로 묶기
+    const requestData = {
+      category: category,
+      season: selectedSeasons[0],
+      color: selectedColors[0],
+      isRaining: isRaining,
+      memo: memo
+    };
 
+    // 3. JSON 객체를 문자열로 바꾸고, application/json 타입의 Blob으로 만들어서 'data'라는 이름으로 담기
+    // (이게 백엔드의 @RequestPart("data")와 완벽하게 연결되는 마법의 코드입니다!)
+    formData.append(
+      "data", 
+      new Blob([JSON.stringify(requestData)], { type: "application/json" })
+    );
+
+    // 4. API 호출
     try {
       await addCloth(formData);
-      alert("옷이 추가되었어요.");
-      setIsSubmitted(true);
+      setIsSubmitted(true); 
     } catch (error) {
       console.error("등록 실패:", error);
       alert("의상 등록 중 오류가 발생했습니다.");
     }
   };
 
+  // ✅ handleSubmit 함수 바깥으로 무사히 구출된 화면 렌더링 코드
   if (isSubmitted) {
     return (
         <div className="flex flex-col items-center justify-center h-full p-6 text-center bg-white">
@@ -84,7 +94,6 @@ const UploadDetail = () => {
         <p className="text-gray-500 mb-8">새로운 의상이 옷장에 추가되었습니다.</p>
         
         <div className="flex flex-col w-full gap-3">
-            {/* 추가 등록 버튼 */}
             <button 
             onClick={() => {
                 setPreviewUrl(null);
@@ -101,7 +110,6 @@ const UploadDetail = () => {
             추가로 의상 등록하기
             </button>
 
-            {/* 옷장 이동 버튼 */}
             <button 
             onClick={() => navigate('/closet')}
             className="w-full p-4 bg-black text-white rounded-2xl font-bold"

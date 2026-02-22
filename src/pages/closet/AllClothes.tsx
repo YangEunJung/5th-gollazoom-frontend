@@ -41,8 +41,8 @@ const AllClothes = () => {
       if (response && response.data) {
       setIsUsingWash(response.data.isUsingWashUpTech); 
 
-        if (Array.isArray(response.data.items)) {
-          setClothesData(response.data.items);
+        if (Array.isArray(response.data)) {
+          setClothesData(response.data);
         }
       }
     } catch (error) {
@@ -165,8 +165,8 @@ const AllClothes = () => {
                 onClick={() => setActiveFilter(tab.value)}
                 className={`px-4 py-1.5 rounded-full text-sm font-medium whitespace-nowrap transition-colors
                  ${activeFilter === tab.value 
-                   ? 'bg-gray-900 text-white shadow-sm' 
-                   : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}
+                   ? 'bg-blue-800 text-white shadow-sm' 
+                   : 'bg-blue-100 text-blue-600 hover:bg-blue-200'}`}
               >
                 {tab.label}
               </button>

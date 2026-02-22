@@ -41,12 +41,12 @@ const CoordiSave = () => {
   useEffect(() => {
   const fetchClothes = async () => {
     try {
-        const token = localStorage.getItem('authToken');
-        const response = await fetch('http://192.168.158.60:8080/api/clothes', { // 실제 의상 API 주소 확인 필요
+        const token = localStorage.getItem('accessToken');
+        const response = await fetch('http://13.125.175.130:8080/api/closet', { // 실제 의상 API 주소 확인 필요
           headers: { 'Authorization': `Bearer ${token}` }
         });
         const result = await response.json();
-        setServerClothes(result.data.items || []);
+        setServerClothes(result.data || []);
       } catch (e) {
         console.error("의상 목록 로드 실패:", e);
       }
