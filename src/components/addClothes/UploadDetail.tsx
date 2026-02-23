@@ -17,7 +17,7 @@ const UploadDetail = () => {
 
   const [category, setCategory] = useState('');
   const [isRaining, setIsRaining] = useState(true);
-  const [selectedSeasons, setSelectedSeasons] = useState<string[]>([]);
+  const [season, setSeason] = useState<string>('');
   const [selectedColors, setSelectedColors] = useState<string[]>([]);
   const [memo, setMemo] = useState('');
   const [isSubmitted, setIsSubmitted] = useState(false);
@@ -33,11 +33,9 @@ const UploadDetail = () => {
     }
   }, [state, navigate]);
 
-  // 토글 함수 계절용
-  const toggleSeason = (value: string) => {
-    setSelectedSeasons(prev => 
-      prev.includes(value) ? prev.filter(s => s !== value) : [...prev, value]
-    );
+  const handleSeasonClick = (value: string) => {
+    // 클릭한 값 하나만 저장
+    setSeason(value);
   };
 
   // 토글 함수 색상
@@ -49,7 +47,7 @@ const UploadDetail = () => {
 
 const handleSubmit = async () => {
     // 0. 필수 항목 검사
-    if (!imageFile || !category || selectedSeasons.length === 0 || selectedColors.length === 0) {
+    if (!imageFile || !category || !season || selectedColors.length === 0) {
       alert("이미지와 필수 항목을 모두 선택해주세요.");
       return;
     }
@@ -62,7 +60,7 @@ const handleSubmit = async () => {
     // 2. 나머지 텍스트 데이터를 하나의 JSON 객체로 묶기
     const requestData = {
       category: category,
-      season: selectedSeasons[0],
+      season: season,
       color: selectedColors[0],
       isRaining: isRaining,
       memo: memo
@@ -99,7 +97,7 @@ const handleSubmit = async () => {
                 setPreviewUrl(null);
                 setImageFile(null);
                 setCategory('');
-                setSelectedSeasons([]);
+                setSeason('');
                 setSelectedColors([]);
                 setMemo('');
                 setIsSubmitted(false);
@@ -178,17 +176,18 @@ const handleSubmit = async () => {
           </div>
 
           {/* 2. 계절 */}
-          <div>
-            <label className="block text-sm font-bold text-gray-500 mb-3">계절 (중복 가능)</label>
-            <div className="flex flex-wrap gap-2">
+          <div className="flex flex-col gap-1.5">
+            <label className="text-sm font-semibold text-gray-600">계절 선택</label>
+            <div className="flex gap-2 mt-1 flex-wrap">
               {SEASON_OPTIONS.map((opt) => (
                 <button
                   key={opt.value}
-                  onClick={() => toggleSeason(opt.value)}
-                  className={`px-4 py-2 rounded-full border text-sm font-bold transition-all ${
-                    selectedSeasons.includes(opt.value) 
+                  type="button"
+                  onClick={() => handleSeasonClick(opt.value)}
+                  className={`px-4 py-2 rounded-full text-sm font-medium border transition-all ${
+                    season === opt.value // 배열이 아니라 단일 값 비교
                       ? 'bg-blue-600 text-white border-blue-600' 
-                      : 'bg-blue-10 text-gray-400 border-blue-200'
+                      : 'bg-white text-gray-400 border-gray-200'
                   }`}
                 >
                   {opt.label}
