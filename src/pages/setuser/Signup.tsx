@@ -38,13 +38,11 @@ const SignupPage = () => {
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        /*
 
         if (!isUsernameValid) {
             showAlert("아이디 중복확인을 먼저 완료해주세요.", "error");
             return;
         }
-        */
 
         try {
             const data = await signup(formData);
@@ -64,22 +62,21 @@ const SignupPage = () => {
             showAlert("아이디를 입력해주세요.", "error");
             return;
         }
-
         try {
-            const data = await checkUsername(formData.username);
-            if (data && data.username) {
+            const responseData = await checkUsername(formData.username);
+            
+            const isAvailable = responseData.data; 
+            if (isAvailable === true) {
+                showAlert("사용 가능한 아이디입니다.", "success");
+                setIsUsernameValid(true);
+            } else {
                 showAlert("이미 사용 중인 아이디입니다.", "error");
                 setIsUsernameValid(false);
-            } 
-        } catch (error: any) {
-            if (error.response && error.response.status === 404) {
-              showAlert("사용 가능한 아이디입니다.", "success");
-              setIsUsernameValid(true);
-            } else {
+            }
+        } catch (error) {
              console.error("중복 확인 에러", error);
              showAlert("중복 확인 중 오류가 발생했습니다.", "error");
              setIsUsernameValid(false);
-            }        
         }
     }
 
@@ -154,7 +151,6 @@ const SignupPage = () => {
             </span>
           </div>
         </div>
-
         <AlertModal 
             isOpen={alertState.isOpen}
             onClose={closeAlert}

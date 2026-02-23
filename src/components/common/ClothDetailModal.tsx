@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { CATEGORY_OPTIONS, SEASON_OPTIONS, type Option } from '../../data/constants';
 import { deleteCloth, updateCloth, type UpdateClothRequest } from '../../api/closet';
 import ClothItem from '../../components/common/ClothItem';
+import AlertModal from '../../components/modal/Alert'; 
+import ConfirmModal from '../../components/common/ConfirmModal';
 
 export interface ClothData {
   clothId: number | string;
@@ -36,17 +38,35 @@ const ClothDetailModal = ({ data, onClose, onRefresh }: ClothDetailModalProps) =
     SEASON_OPTIONS.find(opt => opt.value === s)?.label || s
   ).join(', ');
 
-  const handleDelete = async () => {
-    if (!window.confirm("정말 이 옷을 삭제할까요?")) return;
+  const [isConfirmOpen, setIsConfirmOpen] = useState(false);
+
+  const [alertState, setAlertState] = useState({
+      isOpen: false,
+      message: "",
+      type: "info" as "success" | "error" | "info",
+      onConfirm: () => {} 
+  });
+
+  const showAlert = (message: string, type: "success" | "error" | "info" = "info", onConfirm?: () => void) => {
+      setAlertState({ 
+          isOpen: true, 
+          message, 
+          type, 
+          onConfirm: onConfirm || (() => setAlertState(prev => ({ ...prev, isOpen: false })))
+      });
+  };
+
+  const executeDelete = async () => {
+    setIsConfirmOpen(false);
     try {
         await deleteCloth(String(data.clothId));
-        alert("옷이 성공적으로 삭제되었습니다.");
-        onRefresh();
-        onClose();
-      }catch (e) {
+        showAlert("옷이 성공적으로 삭제되었습니다.", "success", () => {
+          onRefresh();
+          onClose();
+        });
+      } catch (e) {
       console.error(e);
-      alert("삭제에 실패했습니다.");
-
+      showAlert("삭제에 실패했습니다.", "error");
     }
   };
 
@@ -235,16 +255,29 @@ const ClothDetailModal = ({ data, onClose, onRefresh }: ClothDetailModalProps) =
           )}
         </div>
 
-        {/* 삭제 버튼만 유지 */}
-        <div className="mt-8">
+        <div className="flex gap-3 mt-6">
           <button 
-            onClick={handleDelete} 
-            className="w-full p-4 text-red-500 border border-red-100 rounded-2xl font-bold hover:bg-red-50 transition-all flex items-center justify-center gap-2"
+            onClick={() => setIsConfirmOpen(true)} 
+            className="flex-1 p-3.5 text-red-500 border border-red-200 rounded-2xl font-bold hover:bg-red-50 transition-colors"
           >
             의상 삭제하기
           </button>
         </div>
       </div>
+
+      <ConfirmModal 
+        isOpen={isConfirmOpen}
+        onClose={() => setIsConfirmOpen(false)}
+        onConfirm={executeDelete}
+        message="옷을 삭제할까요? 삭제한 옷은 다시 복구할 수 없습니다."
+      />
+
+      <AlertModal 
+        isOpen={alertState.isOpen}
+        onClose={alertState.onConfirm}
+        message={alertState.message}
+        type={alertState.type}
+      />
     </div>
   );
 
