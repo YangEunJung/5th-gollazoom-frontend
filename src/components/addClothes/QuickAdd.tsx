@@ -8,6 +8,7 @@ import {
 } from '../../data/constants';
 import { useNavigate } from "react-router-dom";
 import { addQuickCloth, type QuickClothRequest } from '../../api/closet';
+import AlertModal from '../../components/modal/Alert';
 
 // 아이콘 경로를 반환하는 헬퍼 함수
 const getIconPath = (cat: string, sub: string) => {
@@ -33,10 +34,26 @@ const QuickAdd = () => {
   };
 
   const iconUrl = getIconPath(category, subCategory);
+
+  const [alertState, setAlertState] = useState({
+      isOpen: false,
+      message: "",
+      type: "info" as "success" | "error" | "info",
+      onConfirm: () => {} 
+  });
+
+  const showAlert = (message: string, type: "success" | "error" | "info" = "info", onConfirm?: () => void) => {
+      setAlertState({ 
+          isOpen: true, 
+          message, 
+          type, 
+          onConfirm: onConfirm || (() => setAlertState(prev => ({ ...prev, isOpen: false })))
+      });
+  };
   
   const handleSubmit = async () => {
     if (!category || !subCategory || !selectedColor || selectedSeasons.length === 0) {
-      alert("모든 필수 항목을 선택해주세요!");
+      showAlert("모든 필수 항목을 선택해주세요!", "error");
       return;
     }
 
@@ -57,11 +74,10 @@ const QuickAdd = () => {
       // 💡 기존 addCloth 대신 새로 만든 addQuickCloth를 호출합니다!
       await addQuickCloth(requestBody);
       console.log("퀵등록 요청:", requestBody);
-      alert("의상이 추가되었습니다.");
-      navigate('/closet');
+      showAlert("의상이 추가되었습니다.", "success", () => navigate('/closet'));
     } catch (error) {
       console.error(error);
-      alert("등록 실패");
+      showAlert("등록 실패", "error");
     }
   };
 

@@ -7,6 +7,7 @@ import {
   type Option 
 } from '../../data/constants';
 import { addCloth } from '../../api/closet';
+import AlertModal from '../../components/modal/Alert';
 
 const UploadDetail = () => {
   const { state } = useLocation();
@@ -47,19 +48,27 @@ const UploadDetail = () => {
     );
   };
 
-const handleSubmit = async () => {
-    // 0. 필수 항목 검사
+  const [alertState, setAlertState] = useState({
+    isOpen: false,
+    message: "",
+    type: "info" as "success" | "error" | "info"
+  });
+
+  const showAlert = (message: string, type: "success" | "error" | "info" = "info") => {
+    setAlertState({ isOpen: true, message, type });
+  };
+
+  const handleSubmit = async () => {
     if (!imageFile || !category || selectedSeasons.length === 0 || selectedColors.length === 0) {
-      alert("이미지와 필수 항목을 모두 선택해주세요.");
+      showAlert("이미지와 필수 항목을 모두 선택해주세요.", "error");
+      return;
       return;
     }
 
     const formData = new FormData();
     
-    // 1. 이미지 파일 담기 (백엔드의 @RequestPart("image")와 연결)
     formData.append('image', imageFile); 
 
-    // 2. 나머지 텍스트 데이터를 하나의 JSON 객체로 묶기
     const requestData = {
       category: category,
       season: selectedSeasons[0],
@@ -68,24 +77,20 @@ const handleSubmit = async () => {
       memo: memo
     };
 
-    // 3. JSON 객체를 문자열로 바꾸고, application/json 타입의 Blob으로 만들어서 'data'라는 이름으로 담기
-    // (이게 백엔드의 @RequestPart("data")와 완벽하게 연결되는 마법의 코드입니다!)
     formData.append(
       "data", 
       new Blob([JSON.stringify(requestData)], { type: "application/json" })
     );
 
-    // 4. API 호출
     try {
       await addCloth(formData);
       setIsSubmitted(true); 
     } catch (error) {
       console.error("등록 실패:", error);
-      alert("의상 등록 중 오류가 발생했습니다.");
+      showAlert("의상 등록 중 오류가 발생했습니다.", "error");W
     }
   };
 
-  // ✅ handleSubmit 함수 바깥으로 무사히 구출된 화면 렌더링 코드
   if (isSubmitted) {
     return (
         <div className="flex flex-col items-center justify-center h-full p-6 text-center bg-white">
@@ -233,6 +238,12 @@ const handleSubmit = async () => {
           </button>
         </div>
       </div>
+      <AlertModal 
+        isOpen={alertState.isOpen}
+        onClose={() => setAlertState(prev => ({ ...prev, isOpen: false }))}
+        message={alertState.message}
+        type={alertState.type}
+      />
     </div>
   );
 };

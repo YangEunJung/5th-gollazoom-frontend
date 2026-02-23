@@ -1,8 +1,8 @@
 import api from './axios';
 
 interface changePassword {
-    currentpassword: string;
-    newpassword: string;
+    currentPassword: string;
+    newPassword: string;
 }
 
 interface UserData {
@@ -27,7 +27,7 @@ export const login = async (credentials: Credentials) => {
 }
 
 export const changePassword = async (userPassword: changePassword) => {
-  const response = await api.patch(`/users/password`, userPassword);
+  const response = await api.patch(`/users/me/password`, userPassword);
   return response.data;
 };
 
@@ -56,17 +56,17 @@ export const checkUsername = async (username: string) => {
 }
 
 export const changeNickname = async (nickname: string) => {
-  const response = await api.patch(`/users/nickname`, { nickname });
+  const response = await api.patch(`/users/me/nickname`, { nickname });
   return response.data;
 };
 
 export const changeWorktime = async (worktime: string) => {
-    const response = await api.patch('/users/worktime', { worktime });
+    const response = await api.patch('/users/me/worktime', { worktime });
     return response.data;
 }
 
 export const changeWashsetting = async (isUsingWashUpTech: boolean) => {
-  const response = await api.patch('/users/wash-setting', {
+  const response = await api.patch('/users/me/wash-setting', {
     isUsingWashUpTech: isUsingWashUpTech
   });
   return response.data;
